@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Fish QR Upload</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Admin Panel</h1>
+  <form id="upload-form">
+    <label for="fishName">Fish Name:</label>
+    <input type="text" id="fishName" name="fishName" required>
+
+    <label for="catchPlace">Place of Catch:</label>
+    <input type="text" id="catchPlace" name="catchPlace" required>
+
+    <label for="catchDate">Date of Catch:</label>
+    <input type="date" id="catchDate" name="catchDate" required>
+
+    <label for="qrCode">QR Code Image:</label>
+    <input type="file" id="qrCode" name="qrCode" accept="image/*" required>
+
+    <button type="submit">Upload Details</button>
+  </form>
+
+  <h2>Uploaded Fish Details</h2>
+  <table id="fish-details-table">
+    <thead>
+      <tr>
+        <th>Fish Name</th>
+        <th>Place</th>
+        <th>Date</th>
+        <th>QR Code</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Rows populated by script.js -->
+    </tbody>
+  </table>
+
+  <script src="script.js"></script>
+</body>
+</html>
