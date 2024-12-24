@@ -1,45 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel - Fish QR Upload</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Admin Panel</h1>
-  <form id="upload-form">
-    <label for="fishName">Fish Name:</label>
-    <input type="text" id="fishName" name="fishName" required>
+    <h1>Admin Panel</h1>
+    <form id="uploadForm">
+        <label for="fishName">Fish Name:</label>
+        <input type="text" id="fishName" required><br>
 
-    <label for="catchPlace">Place of Catch:</label>
-    <input type="text" id="catchPlace" name="catchPlace" required>
+        <label for="place">Place:</label>
+        <input type="text" id="place" required><br>
 
-    <label for="catchDate">Date of Catch:</label>
-    <input type="date" id="catchDate" name="catchDate" required>
+        <label for="date">Date:</label>
+        <input type="date" id="date" required><br>
 
-    <label for="qrCode">QR Code Image:</label>
-    <input type="file" id="qrCode" name="qrCode" accept="image/*" required>
+        <label for="qrCode">QR Code URL:</label>
+        <input type="text" id="qrCode" required><br>
 
-    <button type="submit">Upload Details</button>
-  </form>
+        <button type="submit">Upload</button>
+    </form>
 
-  <h2>Uploaded Fish Details</h2>
-  <table id="fish-details-table">
-    <thead>
-      <tr>
-        <th>Fish Name</th>
-        <th>Place</th>
-        <th>Date</th>
-        <th>QR Code</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Rows populated by script.js -->
-    </tbody>
-  </table>
+    <h2>Uploaded Fish Details</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Place</th>
+                <th>Date</th>
+                <th>QR Code</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="fishTable"></tbody>
+    </table>
 
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
