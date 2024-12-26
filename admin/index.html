@@ -3,45 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Admin - Upload Fish Details</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Admin Panel</h1>
-    <form id="uploadForm">
-        <label for="fishName">Fish Name:</label>
-        <input type="text" id="fishName" required><br>
-
-        <label for="place">Place:</label>
-        <input type="text" id="place" required><br>
-
-        <label for="date">Date:</label>
-        <input type="date" id="date" required><br>
-
-        <label for="qrCode">QR Code URL:</label>
-        <input type="text" id="qrCode" required><br>
-
-        <label for="photo">Photo URL:</label>
-        <input type="text" id="photo" required><br>
-
+    <h1>Admin - Upload Fish Details</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="name">Fish Name:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="place">Place of Catch:</label>
+        <input type="text" id="place" name="place" required>
+        <label for="date">Date of Catch:</label>
+        <input type="date" id="date" name="date" required>
+        <label for="qrCode">QR Code:</label>
+        <input type="file" id="qrCode" name="qrCode" accept="image/*" required>
+        <label for="photo">Fish Photo:</label>
+        <input type="file" id="photo" name="photo" accept="image/*" required>
         <button type="submit">Upload</button>
     </form>
-
-    <h2>Uploaded Fish Details</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Place</th>
-                <th>Date</th>
-                <th>QR Code</th>
-                <th>Photo</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody id="fishTable"></tbody>
-    </table>
-
+    <div id="list"></div>
     <script src="script.js"></script>
 </body>
 </html>

@@ -1,38 +1,41 @@
-const backendUrl = "https://holaqrwebsite.onrender.com";
+const apiBase = "https://holaqrwebsite.onrender.com";
 
 document.getElementById("customerForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = document.getElementById("email").value;
+    const name = document.getElementById("name").value;
     const phone = document.getElementById("phone").value;
 
-    await fetch(`${backendUrl}/customer/details`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, phone }),
-    });
-
-    loadFishDetails();
+    try {
+        await fetch(`${apiBase}/customer/save`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, phone }),
+        });
+        alert("Details saved. Viewing fish details...");
+        fetchFishList();
+    } catch (error) {
+        console.error("Error:", error);
+    }
 });
 
-async function loadFishDetails() {
-    const response = await fetch(`${backendUrl}/customer/list`);
-    const fishList = await response.json();
-
-    const fishContainer = document.getElementById("fishContainer");
-    fishContainer.innerHTML = "";
-
-    fishList.forEach((fish) => {
-        const fishCard = document.createElement("div");
-        fishCard.className = "fish-card";
-        fishCard.innerHTML = `
-            <h3>${fish.name}</h3>
-            <p><strong>Place:</strong> ${fish.place}</p>
-            <p><strong>Date:</strong> ${fish.date}</p>
-            <p><strong>QR Code:</strong></p>
-            <img src="${fish.qrCode}" alt="QR Code" width="100">
-            <p><strong>Photo:</strong></p>
-            <img src="${fish.photo}" alt="Photo" width="100">
-        `;
-        fishContainer.appendChild(fishCard);
-    });
+async function fetchFishList() {
+    try {
+        const response = await fetch(`${apiBase}/customer/list`);
+        const data = await response.json();
+        const list = document.getElementById("list");
+        list.innerHTML = data
+            .map(
+                (fish) => `
+                <div>
+                    <h3>${fish.name}</h3>
+                    <p>${fish.place} - ${fish.date}</p>
+                    <img src="${apiBase}${fish.qrCode}" alt="QR Code" width="100">
+                    <img src="${apiBase}${fish.photo}" alt="Fish Photo" width="100">
+                </div>
+            `
+            )
+            .join("");
+    } catch (error) {
+        console.error("Error:", error);
+    }
 }
