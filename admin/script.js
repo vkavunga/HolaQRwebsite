@@ -1,50 +1,43 @@
-const apiBase = "https://holaqrwebsite.onrender.com";
+const apiUrl = "https://holaqrwebsite.onrender.com/fish";
 
-document.getElementById("uploadForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-
+async function fetchFishDetails() {
     try {
-        const response = await fetch(`${apiBase}/admin/upload`, { method: "POST", body: formData });
-        const result = await response.json();
-        alert(result.message);
-        fetchFishList();
-    } catch (error) {
-        console.error("Error:", error);
-    }
-});
-
-async function fetchFishList() {
-    try {
-        const response = await fetch(`${apiBase}/admin/list`);
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
-        const list = document.getElementById("list");
-        list.innerHTML = data
-            .map(
-                (fish) => `
-                <div>
-                    <h3>${fish.name}</h3>
-                    <p>${fish.place} - ${fish.date}</p>
-                    <img src="${apiBase}${fish.qrCode}" alt="QR Code" width="100">
-                    <img src="${apiBase}${fish.photo}" alt="Fish Photo" width="100">
-                    <button onclick="deleteFish(${fish.id})">Delete</button>
-                </div>
-            `
-            )
-            .join("");
+        displayFishDetails(data);
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Error fetching fish details:", error);
+        document.getElementById("fishList").innerHTML = "<p>Unable to load fish details.</p>";
     }
 }
 
-async function deleteFish(id) {
-    try {
-        await fetch(`${apiBase}/admin/delete/${id}`, { method: "DELETE" });
-        alert("Fish deleted successfully!");
-        fetchFishList();
-    } catch (error) {
-        console.error("Error:", error);
+function displayFishDetails(fishData) {
+    const fishList = document.getElementById("fishList");
+    fishList.innerHTML = ""; // Clear existing data
+
+    if (fishData.length === 0) {
+        fishList.innerHTML = "<p>No fish details available.</p>";
+        return;
     }
+
+    fishData.forEach((fish) => {
+        const fishItem = document.createElement("div");
+        fishItem.classList.add("fish-item");
+
+        fishItem.innerHTML = `
+            <h3>${fish.name}</h3>
+            <p><strong>Place of Catch:</strong> ${fish.place}</p>
+            <p><strong>Date of Catch:</strong> ${fish.date}</p>
+            <img src="${fish.photo}" alt="Fish Photo" class="fish-photo" />
+            <img src="${fish.qrCode}" alt="QR Code" class="fish-qr" />
+        `;
+
+        fishList.appendChild(fishItem);
+    });
 }
 
-fetchFishList();
+// Fetch data on page load
+fetchFishDetails();
