@@ -1,81 +1,96 @@
 const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
-const bodyParser = require("body-parser");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = 3000;
 
 // Middleware
-app.use(bodyParser.json());
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Connect to SQLite Database
+// Database setup
 const db = new sqlite3.Database("./database.sqlite", (err) => {
-  if (err) {
-    console.error("Error connecting to database", err.message);
-  } else {
+    if (err) console.error(err.message);
     console.log("Connected to SQLite database.");
-  }
 });
 
-// Create Fish Details Table (if not exists)
-db.run(
-  `CREATE TABLE IF NOT EXISTS fish (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    place TEXT,
-    date TEXT,
-    qrCode TEXT
-  )`
-);
+// Initialize tables
+db.serialize(() => {
+    db.run(`
+        CREATE TABLE IF NOT EXISTS fish (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            place TEXT NOT NULL,
+            date TEXT NOT NULL,
+            qrCode TEXT NOT NULL,
+            photo TEXT NOT NULL
+        )
+    `);
 
-// API to Add Fish Details
+    db.run(`
+        CREATE TABLE IF NOT EXISTS customers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL,
+            phone TEXT NOT NULL
+        )
+    `);
+});
+
+// Routes
+
+// Admin: Upload fish details
 app.post("/admin/upload", (req, res) => {
-  const { name, place, date, qrCode } = req.body;
-
-  if (!name || !place || !date || !qrCode) {
-    return res.status(400).json({ message: "All fields are required." });
-  }
-
-  db.run(
-    `INSERT INTO fish (name, place, date, qrCode) VALUES (?, ?, ?, ?)`,
-    [name, place, date, qrCode],
-    function (err) {
-      if (err) {
-        console.error("Error inserting data", err.message);
-        return res.status(500).json({ message: "Failed to upload fish details." });
-      }
-      res.status(201).json({ message: "Fish details uploaded successfully." });
-    }
-  );
+    const { name, place, date, qrCode, photo } = req.body;
+    const query = `INSERT INTO fish (name, place, date, qrCode, photo) VALUES (?, ?, ?, ?, ?)`;
+    db.run(query, [name, place, date, qrCode, photo], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: "Fish details uploaded successfully!", id: this.lastID });
+    });
 });
 
-// API to Fetch Fish Details
+// Admin: List all fish details
 app.get("/admin/list", (req, res) => {
-  db.all(`SELECT * FROM fish`, [], (err, rows) => {
-    if (err) {
-      console.error("Error fetching data", err.message);
-      return res.status(500).json({ message: "Failed to fetch fish details." });
-    }
-    res.status(200).json(rows);
-  });
+    db.all("SELECT * FROM fish", [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
 });
 
-// API to Delete a Fish Entry
+// Admin: Delete fish details
 app.delete("/admin/delete/:id", (req, res) => {
-  const { id } = req.params;
-
-  db.run(`DELETE FROM fish WHERE id = ?`, [id], function (err) {
-    if (err) {
-      console.error("Error deleting data", err.message);
-      return res.status(500).json({ message: "Failed to delete fish details." });
-    }
-    res.status(200).json({ message: "Fish details deleted successfully." });
-  });
+    const id = req.params.id;
+    const query = `DELETE FROM fish WHERE id = ?`;
+    db.run(query, [id], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: "Fish details deleted successfully!" });
+    });
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+// Customer: List all fish details
+app.get("/customer/list", (req, res) => {
+    db.all("SELECT * FROM fish", [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+});
+
+// Customer: Collect customer details
+app.post("/customer/details", (req, res) => {
+    const { email, phone } = req.body;
+    const query = `INSERT INTO customers (email, phone) VALUES (?, ?)`;
+    db.run(query, [email, phone], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: "Customer details submitted successfully!" });
+    });
+});
+
+// Serve static files (optional for frontend assets)
+app.use(express.static(path.join(__dirname, "public")));
+
+// Start server
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
 });
